@@ -1,0 +1,21 @@
+{
+  "name": "cf-orbs-template",
+  "private": true,
+  "scripts": {
+    "deploy": "wrangler deploy --config .cf-orbs/wrangler.jsonc",
+    "postinstall": "node scripts/check-container-names.mjs"
+  },
+  "cloudflare": {
+    "bindings": {
+      "CONTROL_TOKEN": {
+        "description": "Optional, only for the cf-orbs CLI (status, logs, doctor). Leave it empty for a no-CLI install; the CLI can set it later."
+      },
+      "AMP_ORB_PROVIDER_TOKEN": {
+        "description": "Your Amp provider token (`aop_live_…`) from Amp Settings → Orbs → Add Provider. Paste the one you made there; the provider starts on its own after the deploy."
+      }
+    }
+  },
+  "devDependencies": {
+    "wrangler": "4.156.0"
+  }
+}

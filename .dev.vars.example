@@ -1,0 +1,12 @@
+# Secrets for the cf-orbs Worker. The Deploy to Cloudflare setup page prompts for every
+# uncommented entry below and sets it as a Worker secret, so only the one the first
+# deploy genuinely needs is uncommented.
+
+# Your Amp provider token (aop_live_…). Make it in Amp → Settings → Orbs → Add Provider
+# and note the provider name you type there; you paste it on the setup page.
+AMP_ORB_PROVIDER_TOKEN=
+
+# Optional, only for the cf-orbs CLI (status, logs, doctor): bearer token for the control
+# API. Leave commented for a set-it-and-forget-it install; to use the CLI later, run
+# `npx cf-orbs init --no-deploy --adopt` in your clone.
+# CONTROL_TOKEN=

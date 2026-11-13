@@ -1,0 +1,75 @@
+// cf-orbs configuration. `cf-orbs init` writes this file as cf-orbs.config.jsonc in your project.
+// `cf-orbs deploy` generates .cf-orbs/wrangler.jsonc from it. Edit this file, never the generated one.
+{
+  // Worker name. A second install (for example another orb size) needs another name.
+  "name": "cf-orbs-template",
+
+  // Orb size. One size per install: Amp sends no size to the provider.
+  // Custom: vcpu 1-4 (fractions allowed), memoryMib up to 12288 and at least 3072 per vCPU, diskMb 8000-20000.
+  // Or a named type: "standard-1" .. "standard-4". "lite" and "basic" are too small for the orb image.
+  // Default 4 vCPU, 12 GiB, 20 GB. `cf-orbs init --vcpu N` writes N vCPU, N x 3 GiB, 20 GB (--vcpu 2 is cheaper).
+  "instance": { "vcpu": 4, "memoryMib": 12288, "diskMb": 20000 },
+
+  // Cap on awake orbs. Spawn number maxRunning + 1 fails with a clear message.
+  "maxRunning": 20,
+
+  // The watchdog pauses (snapshot + stop) an orb awake longer than this.
+  "maxAwakeHours": 12,
+
+  // 0 = off. Else snapshot an awake orb with changes every N minutes (15 or more).
+  "checkpointMinutes": 0,
+
+  // After Amp pauses an orb, keep it running this many minutes (0-120). The disk is saved first.
+  // The next message then reuses the running amp (wake < 1 s). Billed like an awake orb. 0 = stop at once.
+  "warmMinutes": 10,
+
+  // Set transparent huge pages to "always" in each orb (the guest kernel ships with "never").
+  // New memory is then 3-4x faster to allocate. Programs may use a bit more memory.
+  "hugePages": true,
+
+  // 0 = off. Else mount a memory-backed tmpfs of N GiB at /mnt/fast in each orb, for caches and temp data.
+  // Writes there are 4-14x faster than on the root disk. Not saved in snapshots: lost on pause.
+  // It uses orb memory only when files are in it. Max 8, and at most the orb memory in GiB minus 3.
+  "fastTmpfsGb": 0,
+
+  // After each deploy, start this many throwaway instances (0-5) from the new image, then destroy them.
+  // The first spawn on a host without the image pulls 1.8 GB (40-50 s). This raises the odds that the
+  // next spawn lands on a host that has it; Cloudflare picks the host, so it is no guarantee.
+  // Cost: about 1 min of the orb size per instance. 0 = off.
+  "prewarm": 2,
+
+  // "off" (default) or "on-change". With "on-change", a spawn from an Amp project snapshot checks whether amp
+  // updated itself or the orb image changed since the snapshot. If so, cf-orbs forgets the mapping (at most
+  // once per project per 24 h), so the next new thread boots the image. Amp may still keep its cached snapshot:
+  // then delete it in Amp -> Orb Settings -> Snapshots. cf-orbs never starts threads or orbs for this.
+  "projectSnapshotRefresh": "off",
+
+  // Where `amp orb provider` runs: "cloudflare" (a small container in this Worker) or "external" (your own host).
+  "providerHost": "cloudflare",
+
+  // Size of the provider container when providerHost is "cloudflare". It runs all the time.
+  // "lite" (1/16 vCPU, 256 MiB, about $2 a month) is enough for the tested load: 10 spawns at once.
+  // "standard-1" (1/2 vCPU, 4 GiB, about $27 a month) or "standard-2" if `cf-orbs doctor` says the provider is slow.
+  "providerInstance": "lite",
+
+  // Extra orb images: ORB_IMAGE ref -> image key. Each key needs image/<key>.Dockerfile.
+  // The default Amp image always maps to key "orb" (image/Dockerfile). `cf-orbs upgrade` adds old keys here.
+  "images": {},
+
+  // Enable wrangler containers ssh for orbs (debug only).
+  "debugSsh": false
+
+  // Turn on the exec and bench routes. Only for the substrate benchmark: the control token can then run
+  // commands in orbs. true or false.
+  // "debugExec": false,
+
+  // Minutes an orb may sit idle before the container stops. 5-360.
+  // "inactivityTimeoutMinutes": 15,
+
+  // Seconds between watchdog checks of an orb. 10-3600, and shorter than inactivityTimeoutMinutes.
+  // "alarmSeconds": 60,
+
+  // Digest of the Amp orb image the "orb" image is built from. Used for log lines only.
+  // Must look like sha256:<64 hex digits>.
+  // "ampImageDigest": "sha256:378c5e2188f00960eca36dc806aa04e1cacd92c2341665bcdf4692326c462d6d"
+}
