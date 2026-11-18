@@ -1,0 +1,11 @@
+cf-orbs
+Copyright 2026 Meir Dick
+
+This product includes software patterns adapted from cloudflare/sandbox-sdk
+(Apache-2.0, https://github.com/cloudflare/sandbox-sdk): the setsid + boot_id
+background-process guard, the per-object exclusive operation queue, and the
+auto-save alarm loop.
+
+cf-orbs is a community project. It is not affiliated with Cloudflare, Inc. or
+with Sourcegraph, Inc. (Amp). "Cloudflare" and "Amp" are trademarks of their
+respective owners.
